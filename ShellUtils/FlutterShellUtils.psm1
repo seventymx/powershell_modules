@@ -1,0 +1,98 @@
+function Set-AndroidEnvironment {
+    param (
+        [string]$AndroidSdkPath
+    )
+
+    # Set environment variables for Android SDK
+    $env:ANDROID_SDK_ROOT = "$AndroidSdkPath/libexec/android-sdk"
+    $env:ANDROID_HOME = $env:ANDROID_SDK_ROOT
+    Write-Host "ANDROID_SDK_ROOT set to $($env:ANDROID_SDK_ROOT)"
+
+    # Check if running under WSL and set ADB server address
+    $wslDistroName = $env:WSL_DISTRO_NAME
+    if (-not [string]::IsNullOrEmpty($wslDistroName)) {
+        $resolvConfLine = Get-Content /etc/resolv.conf | Select-Object -Last 1
+        $adbServerAddress = $resolvConfLine.Split(' ')[1]
+        $env:ANDROID_ADB_SERVER_ADDRESS = $adbServerAddress
+        Write-Host "Running under WSL, ANDROID_ADB_SERVER_ADDRESS set to $adbServerAddress"
+    }
+}
+
+function Initialize-Fastlane {
+    param (
+        [string] $FastlaneAppIdentifier = $env:FASTLANE_APP_IDENTIFIER_FALLBACK,
+        [string] $FastlaneDebug = $env:FASTLANE_DEBUG_FALLBACK
+    )
+
+    # Set Fastlane environment variables with fallback values
+    $env:FASTLANE_APP_IDENTIFIER = $FastlaneAppIdentifier
+    $env:FASTLANE_DEBUG = $FastlaneDebug
+
+    # Check the operating system and set additional variables if on macOS
+    if ([Environment]::OSVersion.Platform -eq [System.PlatformID]::Unix) {
+        # Additional check to confirm it's actually macOS since PlatformID.Unix can mean macOS or Linux
+        if (Test-Path "/System/Library/CoreServices/SystemVersion.plist") {
+            $env:FASTLANE_APPLE_ID = $env:FASTLANE_USER
+        }
+    }
+
+    Write-Host "Fastlane configuration applied."
+    Write-Host "FASTLANE_APP_IDENTIFIER: $($env:FASTLANE_APP_IDENTIFIER)"
+    Write-Host "FASTLANE_DEBUG: $($env:FASTLANE_DEBUG)"
+    if ($env:FASTLANE_APPLE_ID) {
+        Write-Host "FASTLANE_APPLE_ID: $($env:FASTLANE_APPLE_ID)"
+    }
+}
+
+function Set-FlutterEnvironment {
+    param (
+        [string]$FlutterSdkPath
+    )
+
+    # Add Flutter SDK to PATH
+    $flutterBinPath = Join-Path -Path $FlutterSdkPath -ChildPath "flutter/bin"
+    $env:PATH = "$($flutterBinPath):$($env:PATH)"
+
+    $env:FLUTTER_ROOT = $FlutterSdkPath
+}
+
+function Install-Flutter {
+    param (
+        [string]$Url,
+        [string]$DestinationPath
+    )
+
+    # Create destination directory if it doesn't exist
+    if (-Not (Test-Path $DestinationPath)) {
+        New-Item -ItemType Directory -Path $DestinationPath | Out-Null
+    }
+    else {
+        Set-FlutterEnvironment -FlutterSdkPath $DestinationPath
+
+        Write-Output "Flutter SDK already installed and PATH updated."
+        return
+    }
+
+    # Extract the filename from the URL
+    $fileName = [System.IO.Path]::GetFileName($Url)
+
+    $localTarballPath = Join-Path -Path $DestinationPath -ChildPath $fileName
+
+    # Download the tarball
+    Invoke-WebRequest -Uri $Url -OutFile $localTarballPath
+
+    # Extract the tarball
+    if ($localTarballPath.EndsWith(".zip")) {
+        Expand-Archive -Path $localTarballPath -DestinationPath $DestinationPath
+    }
+    else {
+        # Assuming the tarball is compressed with xz and packaged with tar
+        & tar -xf $localTarballPath -C $DestinationPath
+    }
+
+    Set-FlutterEnvironment -FlutterSdkPath $DestinationPath
+    
+    Write-Output "Flutter SDK loaded and PATH updated."
+}
+
+Export-ModuleMember -Function Set-AndroidEnvironment, Initialize-Fastlane, Install-Flutter

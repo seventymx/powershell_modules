@@ -17,7 +17,28 @@ The primary goals of this repository are:
 
 ### How to Use
 
-TODO - Add instructions on how to depend on this repository with Nix Flakes (version pinning).
+Add this repository as a dependency in your `flake.nix` file to use the PowerShell modules in your project. The following steps demonstrate how to add this repository as a dependency in your project:
+
+```code
+inputs = {
+    ...
+    powershell_modules.url = "github:seventymx/powershell_modules";
+    ...
+}
+```
+
+Pass the `powershell_modules` output to the `shellHook` in your `flake.nix` file to set the `PSModulePath` environment variable:
+
+```code
+outputs = { self, nixpkgs, flake-utils, powershell_modules }:
+    ...
+```
+
+```code
+shellHook = ''
+    export PSModulePath=${powershell_modules}
+    ...
+```
 
 ### Development Guide
 
@@ -36,7 +57,7 @@ code .
 
 1. **Install the PowerShell Extension**: Install the `PowerShell` extension in VSCode to enable syntax highlighting, IntelliSense, and debugging support for PowerShell scripts.
 
-2. **Update the PowerShell Path**: If you dont do this, the PowerShell formatter will not work. Add the following to your `settings.json`:
+2. **Update the PowerShell Path**: Add the following to your `settings.json`:
 
 ```SH
 which pwsh

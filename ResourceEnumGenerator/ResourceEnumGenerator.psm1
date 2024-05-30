@@ -1,4 +1,4 @@
-Update-ResourceNameEnum {
+function Update-ResourceNameEnum {
     param(
         [string]$ProjectFile
     )

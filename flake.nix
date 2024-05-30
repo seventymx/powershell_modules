@@ -16,6 +16,7 @@
       {
         devShell = unstable.mkShell {
           buildInputs = [
+            unstable.git
             unstable.powershell
             unstable.protobuf_21
             unstable.protoc-gen-js

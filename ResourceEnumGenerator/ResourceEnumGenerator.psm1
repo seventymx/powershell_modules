@@ -76,9 +76,6 @@ function Update-JSResourceNameEnum {
         [string]$OutputPath
     )
 
-    $ResourceFilesPath = Resolve-Path -Path $ResourceFilesPath
-    $OutputPath = Resolve-Path -Path $OutputPath
-
     $resourceFiles = Get-ChildItem -Path $ResourceFilesPath -Include *.svg -Recurse
 
     $enumString = "const ResourceName = Object.freeze({`n"

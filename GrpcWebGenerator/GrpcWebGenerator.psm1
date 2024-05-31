@@ -4,6 +4,9 @@ function Add-GrpcWeb {
         [string]$OutputPath
     )
 
+    $ProtoFilesPath = Resolve-Path $ProtoFilesPath
+    $OutputPath = Resolve-Path $OutputPath
+
     if (-not (Test-Path -Path $OutputPath -PathType Container)) {
         New-Item -ItemType Directory -Path $OutputPath
     }
@@ -23,3 +26,5 @@ function Add-GrpcWeb {
 
     Write-Host "gRPC-Web client code generation completed."
 }
+
+Export-ModuleMember -Function Add-GrpcWeb

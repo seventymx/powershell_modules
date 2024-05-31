@@ -45,7 +45,7 @@ shellHook = ''
 To develop and test the PowerShell modules in this repository, follow the steps below:
 
 ```sh
-git clone $repositoryUrl
+git clone $repository_url
 cd powershell_modules
 
 nix develop
@@ -74,6 +74,6 @@ which pwsh
 
 ```json
 {
-    "powershell.powerShellExePath": "$pathToPwsh"
+    "powershell.powerShellExePath": "$path_to_pwsh"
 }
 ```

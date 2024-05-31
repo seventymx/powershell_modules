@@ -66,7 +66,7 @@ nix flake update --update-input powershell_modules
 
 1. **Install the PowerShell Extension**: Install the `PowerShell` extension in VSCode to enable syntax highlighting, IntelliSense, and debugging support for PowerShell scripts.
 
-2. **Update the PowerShell Path**: Add the following to your `settings.json`:
+2. **Update the PowerShell Path**: Add the following to your workspace `settings.json` file to specify the path to the PowerShell executable:
 
 ```SH
 which pwsh
@@ -74,6 +74,8 @@ which pwsh
 
 ```json
 {
-    "powershell.powerShellExePath": "$path_to_pwsh"
+    "powershell.powerShellAdditionalExePaths": {
+        "nix_pwsh": "$path_to_pwsh"
+    }
 }
 ```

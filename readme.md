@@ -53,6 +53,15 @@ nix develop
 code .
 ```
 
+#### Version Pinning
+
+The version of the PowerShell modules in this repository is pinned to ensure that all projects using this repository as a dependency receive the same version of the modules. To update the version of
+the PowerShell modules, update the `flake.lock` file and commit the changes.
+
+```sh
+nix flake update --update-input powershell_modules
+```
+
 #### VSCode Setup
 
 1. **Install the PowerShell Extension**: Install the `PowerShell` extension in VSCode to enable syntax highlighting, IntelliSense, and debugging support for PowerShell scripts.

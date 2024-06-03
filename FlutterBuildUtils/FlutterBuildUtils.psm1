@@ -34,7 +34,7 @@ function Rename-FlutterApp {
     # Rename in pubspec.yaml regex (^name: .*)
     $pubspecFile = Resolve-Path -Path "./pubspec.yaml"
     $content = Get-Content -Path $pubspecFile
-    $content = $content -replace "^name: .*", "name: $newName"
+    $content = $content -replace "^name: .*", "name: $($newName.ToLower())"
     Set-Content -Path $pubspecFile -Value $content
 
     if ($IOS -eq $true) {

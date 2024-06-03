@@ -61,11 +61,14 @@ function Initialize-IOSProjectSetup {
     $mode = Set-Mode -Debug $Debug
     Write-Host "Fetching certificates and provisioning profiles in $mode mode"
 
+    # Change directory to ios - to run fastlane commands
     $initialDirectory = Get-Location
     Set-Location -Path "ios"
     
+    # Create certificates, provisioning profiles if they don't exist - else fetch them
     & fastlane ios create_certificate
     & fastlane ios create_provisioning_profile
+    # Edit the Xcode project file to use the correct provisioning profile and certificate
     & fastlane ios setup_project
 
     Set-Location -Path $initialDirectory
@@ -116,34 +119,28 @@ function Initialize-AndroidProjectSetup {
     Rename-MainActivity
     Rename-FlutterApp
 
-    $initialDirectory = Get-Location
-    Set-Location -Path "android"
-
     $fastlaneAppIdentifier = $env:FASTLANE_APP_IDENTIFIER
 
-    # Create keystore directory if it doesn't exist
-    if (-not (Test-Path "secrets")) {
-        New-Item -ItemType Directory -Path "secrets"
+    # Check if ../../flutter_secrets exists
+    if (-not (Test-Path "../flutter_secrets")) {
+        Write-Host "The flutter_secrets directory does not exist. Please clone the secrets repository."
+        return
+    }
 
-        # Generate keystore file
+    # Check if the keystore file exists
+    $keystoreFile = (Resolve-Path -Path "../flutter_secrets") | Join-Path -ChildPath "$fastlaneAppIdentifier.keystore"
+    if (-not (Test-Path $keystoreFile)) {
+        # Generate the keystore file
         $keystorePassword = $env:KEYSTORE_PASSWORD
-
-        $keystoreFile = (Resolve-Path -Path "./secrets") | Join-Path -ChildPath "$fastlaneAppIdentifier.keystore"
-
+        
         $command = "& keytool -genkey -v -keystore $keystoreFile -alias $fastlaneAppIdentifier -keyalg RSA -keysize 2048 -validity 36500 -storepass $keystorePassword -keypass $keystorePassword -dname `"CN=$fastlaneAppIdentifier, O=$($env:ORGANIZATION_NAME), C=CH`""
         Invoke-Expression -Command $command
 
-        $env:KEYSTORE_FILE = $keystoreFile
-        Write-Host "Keystore file generated at $keystoreFile"
+        Write-Host "Keystore file generated at $keystoreFile - You need to commit the flutter_secrets repository."
     }
     else {
-        $keystoreFile = (Resolve-Path -Path "./secrets") | Join-Path -ChildPath "$fastlaneAppIdentifier.keystore"
-        $env:KEYSTORE_FILE = $keystoreFile
-
         Write-Host "Keystore file already exists at $keystoreFile"
     }
-
-    Set-Location -Path $initialDirectory
 }
 
 Export-ModuleMember -Function Initialize-IOSProjectSetup, Initialize-AndroidProjectSetup

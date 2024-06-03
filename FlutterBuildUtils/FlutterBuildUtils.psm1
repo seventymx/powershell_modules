@@ -9,7 +9,8 @@ function Set-Mode {
 
     if ($Debug -eq $true) {
         $env:FASTLANE_DEBUG = "true"
-    } elseif ($Debug -eq $false) {
+    }
+    elseif ($Debug -eq $false) {
         $env:FASTLANE_DEBUG = "false"
     }
 
@@ -28,8 +29,7 @@ function Rename-FlutterApp {
         [string]$IOS = $false
     )
 
-    $identifierArray = $env:FASTLANE_APP_IDENTIFIER.Split(".")
-    $newName = $identifierArray[$identifierArray.Length - 1]
+    $newName = $env:FASTLANE_APP_NAME
 
     # Rename in pubspec.yaml regex (^name: .*)
     $pubspecFile = Resolve-Path -Path "./pubspec.yaml"
@@ -80,7 +80,7 @@ function Rename-MainActivity {
     # Get the directory where the old package name differs from the new name (to be removed after copying MainActivity.kt to the new directory)
     $oldDir = $mainActivityFile.Substring($srcDir.Length).Split("/") | Select-Object -SkipLast 1 -Skip 1 | Where-Object { $_ -notin $identifierArray } | Select-Object -First 1
     
-    if(-not $oldDir) {
+    if (-not $oldDir) {
         Write-Host "The package name is already the same as the app name"
         return
     }
@@ -135,7 +135,8 @@ function Initialize-AndroidProjectSetup {
 
         $env:KEYSTORE_FILE = $keystoreFile
         Write-Host "Keystore file generated at $keystoreFile"
-    } else {
+    }
+    else {
         $keystoreFile = (Resolve-Path -Path "./secrets") | Join-Path -ChildPath "$fastlaneAppIdentifier.keystore"
         $env:KEYSTORE_FILE = $keystoreFile
 

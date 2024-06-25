@@ -47,6 +47,9 @@ function Set-AndroidEnvironment {
     $env:ANDROID_HOME = $env:ANDROID_SDK_ROOT
     Write-Host "ANDROID_SDK_ROOT set to $($env:ANDROID_SDK_ROOT)"
 
+    # Add android emulator to PATH
+    $env:PATH = "$($env:ANDROID_SDK_ROOT)/emulator:$($env:PATH)"
+
     # Check if running under WSL and set ADB server address
     $wslDistroName = $env:WSL_DISTRO_NAME
     if (-not [string]::IsNullOrEmpty($wslDistroName)) {

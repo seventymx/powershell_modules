@@ -62,12 +62,12 @@ function Set-AndroidEnvironment {
 
 function Initialize-Fastlane {
     param (
-        [string] $FastlaneAppIdentifier = $env:FASTLANE_APP_IDENTIFIER_FALLBACK,
-        [string] $FastlaneAppName = $env:FASTLANE_APP_NAME_FALLBACK,
-        [string] $FastlaneDebug = $env:FASTLANE_DEBUG_FALLBACK
+        [string] $FastlaneAppIdentifier,
+        [string] $FastlaneAppName,
+        [string] $FastlaneDebug
     )
 
-    # Set Fastlane environment variables with fallback values
+    # Set environment variables - App information
     $env:FASTLANE_APP_IDENTIFIER = $FastlaneAppIdentifier
     $env:FASTLANE_APP_NAME = $FastlaneAppName
     $env:FASTLANE_DEBUG = $FastlaneDebug

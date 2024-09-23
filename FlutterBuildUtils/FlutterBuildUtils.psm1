@@ -7,19 +7,17 @@ function Set-Mode {
         [object] $Debug = $null
     )
 
+    # Default mode is debug
+    $Debug = $Debug -eq $false ? $false : $true
+
     if ($Debug -eq $true) {
         $env:FASTLANE_DEBUG = "true"
     }
-    elseif ($Debug -eq $false) {
+    else {
         $env:FASTLANE_DEBUG = "false"
     }
 
-    if (-not $env:FASTLANE_DEBUG) {
-        Write-Host "DEBUG_FASTLANE environment variable is not set. Please pass the -Debug flag to the function or set the environment variable."
-        return
-    }
-
-    $mode = $env:FASTLANE_DEBUG -eq "true" ? "debug" : "release"
+    $mode = $Debug -eq $true ? "debug" : "release"
 
     return $mode
 }

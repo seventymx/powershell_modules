@@ -28,6 +28,7 @@ function Rename-FlutterApp {
     )
 
     $newName = $env:FASTLANE_APP_NAME
+    $identifier = $env:FASTLANE_APP_IDENTIFIER
 
     # Rename in pubspec.yaml regex (^name: .*)
     $pubspecFile = Resolve-Path -Path "./pubspec.yaml"
@@ -43,6 +44,7 @@ function Rename-FlutterApp {
     $androidManifestFile = Resolve-Path -Path "./android/app/src/main/AndroidManifest.xml"
     $content = Get-Content -Path $androidManifestFile
     $content = $content -replace 'android:label=".*"', "android:label=`"$newName`""
+    $content = $content -replace 'package=".*"', "package=`"$identifier`""
     Set-Content -Path $androidManifestFile -Value $content
 }
 

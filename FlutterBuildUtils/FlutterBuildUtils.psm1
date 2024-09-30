@@ -43,8 +43,13 @@ function Rename-FlutterApp {
     # Rename in AndroidManifest.xml regex (android:label=".*")
     $androidManifestFile = Resolve-Path -Path "./android/app/src/main/AndroidManifest.xml"
     $content = Get-Content -Path $androidManifestFile
-    $content = $content -replace 'android:label=".*"', "android:label=`"$newName`""
-    $content = $content -replace 'package=".*"', "package=`"$identifier`""
+
+    # Replace android:label value only
+    $content = $content -replace 'android:label="[^"]*"', "android:label=`"$newName`""
+
+    # Replace package name only
+    $content = $content -replace 'package="[^"]*"', "package=`"$identifier`""
+
     Set-Content -Path $androidManifestFile -Value $content
 }
 
